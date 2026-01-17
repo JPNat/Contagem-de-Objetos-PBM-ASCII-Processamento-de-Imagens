@@ -19,22 +19,21 @@ int main () {
 
     // Valor padrão da linha do arquivo
     char line[1024];
+    char tipo[3];
 
     // Lê o header (P2)
-    fscanf(in, "[^\n]\n", line);
-    printf("%s", line);
-
-    fscanf(in, "[^\n]\n", line);
-    fscanf(in, "[^\n]\n", line);
-    
+    fscanf(in, "%s", tipo);
+    printf("Tipo: %s\n", tipo);
 
     // Lê a largura e altura
     int coluna, linha;
-
     fscanf(in, "%d %d", &coluna, &linha);
-    printf("%d %d", coluna, linha);
+    printf("%d %d \n", coluna, linha);
 
-    
     // Lê o valor máximo da intensidade
+
+    int intensidade;
+    fscanf(in, "%d", &intensidade);
+    printf("Intensidade: %d \n", intensidade);
 
 };
