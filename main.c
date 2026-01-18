@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+// Criar função que descobre se o pixel é vizinho 4
+
+// Criar função que descobre se o pixel é vizinho 8
+
 int main () {
 
     FILE * in;
@@ -30,10 +34,21 @@ int main () {
     fscanf(in, "%d %d", &coluna, &linha);
     printf("%d %d \n", coluna, linha);
 
-    // Lê o valor máximo da intensidade
 
+    // Lê o valor máximo da intensidade
     int intensidade;
     fscanf(in, "%d", &intensidade);
     printf("Intensidade: %d \n", intensidade);
+
+
+    // Função que passa por todos os pixeis
+    for(int i = 0; i < linha; i ++){
+        for(int j = 0; j < coluna; j++){
+
+            int pixel;
+            fscanf(in, "%d", &pixel);
+
+        }
+    }
 
 };
