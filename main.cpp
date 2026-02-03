@@ -26,6 +26,11 @@ public:
         }
     }
 
+    std::vector<int> get(){
+
+        return parent;
+    }
+
     // Find the representative (root) of the
     // set that includes element i
     int find(int i) {
@@ -95,9 +100,11 @@ int vizinho_acima(const std::vector<std::vector<int>>& matriz, int posicao_x_pix
 
 int main () {
 
+    printf("Programa iniciado\n");
+
     FILE * in;
 
-    char endereco[10000];
+    char endereco[1000];
 
     printf("Digite o endereço da imagems: ");
     scanf(" %[^\n]", endereco);
@@ -123,11 +130,6 @@ int main () {
     fscanf(in, "%d %d", &coluna, &linha);
     printf("%d %d \n", coluna, linha);
 
-
-    // Lê o valor máximo da intensidade
-    int intensidade;
-    fscanf(in, "%d", &intensidade);
-    printf("Intensidade: %d \n", intensidade);
 
     // Matriz da imagem como um vetor de vetores
     std::vector<std::vector<int>> imagem(linha, std::vector<int>(coluna));
@@ -163,7 +165,7 @@ int main () {
             int posicao_pixel_atual = (coluna*i) + j;
 
 
-            // Se estiver na ponta, não faz nada
+            // Se o pixel estiver na ponta, não faz nada
             if (i == 0 && j == 0){
                 continue;
             }
@@ -208,8 +210,31 @@ int main () {
             if(pixel == pixel_lado){
                     unionFind.unite(posicao_pixel_lado, posicao_pixel_atual);
                 }
-            
-
         }
     }
+
+    std::vector<int> parentes = unionFind.get();
+
+    int grupos_pixels_0 = 0;
+    int grupos_pixels_1 = 0;
+    int buracos = 0;
+
+    // Conta os parentes
+    for(int i = 0; i < coluna*linha; i++){
+
+        if(unionFind.find(i) == i){
+
+            if(imagem_array[i] == 0){
+
+                grupos_pixels_0++;
+            }
+            
+            if(imagem_array[i] == 1 || imagem_array[i] == 255){
+                grupos_pixels_1++;
+            }
+        
+        }
+    }
+
+    printf("Número de objetos: %d", grupos_pixels_0);
 };
