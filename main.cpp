@@ -217,7 +217,6 @@ int main () {
 
     int grupos_pixels_0 = 0;
     int grupos_pixels_1 = 0;
-    int buracos = 0;
 
     // Conta os parentes
     for(int i = 0; i < coluna*linha; i++){
@@ -225,16 +224,17 @@ int main () {
         if(unionFind.find(i) == i){
 
             if(imagem_array[i] == 0){
-
                 grupos_pixels_0++;
             }
             
             if(imagem_array[i] == 1 || imagem_array[i] == 255){
                 grupos_pixels_1++;
+
             }
         
         }
     }
 
-    printf("Número de objetos: %d", grupos_pixels_0);
+    printf("Numero de objetos: %d \n", grupos_pixels_0);
+    printf("Numero de buracos: %d", grupos_pixels_1 - 1);
 };
