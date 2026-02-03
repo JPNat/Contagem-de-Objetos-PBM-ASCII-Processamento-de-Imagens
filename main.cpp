@@ -5,9 +5,7 @@
 
 // Qual a ideia principal do algoritmo?
 
-// Ser recursivo
-
-// Quando examinar uma parte, tirar esses pixels do problema
+// Usar UnionFind
 
 
 // Código pego em https://www.geeksforgeeks.org/dsa/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/
@@ -62,6 +60,7 @@ public:
 };
 
 // ------------------------------------------------------------------------------------------------------
+
 
 // Criar função que descobre se o pixel é vizinho de 4 pontos pretos "1"
 int vizinhos_quatro_eh_1(const std::vector<std::vector<int>>& matriz, int posicao_x_pixel, int posicao_y_pixel){
@@ -181,7 +180,7 @@ int main () {
                 }
 
                 continue;
-                
+
             }
 
             // Se tiver no topo da matriz, pega só o vizinho de cima
@@ -199,16 +198,21 @@ int main () {
             // Aqui o pixel está no meio da imagem. Sem nenhum implicação
             int posicao_pixel_acima = (coluna*(i-1)) + j;
             int posicao_pixel_lado = (coluna*i)+ (j-1);
+            int pos_diag = (coluna * (i - 1)) + (j - 1);
 
             int pixel_acima = vizinho_acima(imagem, i, j);
             int pixel_lado = vizinho_esquerda(imagem, i, j);
-            
+
             if(pixel == pixel_acima){
                     unionFind.unite(posicao_pixel_acima, posicao_pixel_atual);
                 }
 
             if(pixel == pixel_lado){
                     unionFind.unite(posicao_pixel_lado, posicao_pixel_atual);
+                }
+
+            if (pixel == imagem[i - 1][j - 1]) {
+                    unionFind.unite(posicao_pixel_atual, pos_diag);
                 }
         }
     }
@@ -226,15 +230,15 @@ int main () {
             if(imagem_array[i] == 0){
                 grupos_pixels_0++;
             }
-            
-            if(imagem_array[i] == 1 || imagem_array[i] == 255){
+
+            if(imagem_array[i] == 1){
                 grupos_pixels_1++;
 
             }
-        
+
         }
     }
 
-    printf("Numero de objetos: %d \n", grupos_pixels_0);
-    printf("Numero de buracos: %d", grupos_pixels_1 - 1);
+    printf("Numero de objetos: %d \n", grupos_pixels_1);
+    printf("Numero de buracos: %d", grupos_pixels_0 - 1);
 };
