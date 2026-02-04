@@ -5,7 +5,9 @@
 
 // Qual a ideia principal do algoritmo?
 
-// Usar UnionFind
+// Usar UnionFind para separar os pixels em pontos "pais"
+
+// Com isso, é fácil identificar agrupamentos de pixels 1 e de pixel 0
 
 
 // Código pego em https://www.geeksforgeeks.org/dsa/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/
@@ -99,8 +101,6 @@ int vizinho_acima(const std::vector<std::vector<int>>& matriz, int posicao_x_pix
 
 int main () {
 
-    printf("Programa iniciado\n");
-
     FILE * in;
 
     char endereco[1000];
@@ -143,9 +143,11 @@ int main () {
     for(int i = 0; i < linha; i ++){
         for(int j = 0; j < coluna; j++){
 
-            int pixel_lido;
-            fscanf(in, "%d", &pixel_lido);
-            imagem[i][j] = pixel_lido;
+            char pixel_lido;
+            int pixel_lido_int;
+            fscanf(in, " %c", &pixel_lido);
+            pixel_lido_int = pixel_lido - '0';
+            imagem[i][j] = pixel_lido_int;
             imagem_array[(coluna * i) + j] = imagem[i][j];
         }
     }
