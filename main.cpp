@@ -10,7 +10,7 @@
 // Com isso, é fácil identificar agrupamentos de pixels 1 e de pixel 0
 
 
-// Código pego em https://www.geeksforgeeks.org/dsa/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/
+// Código da classe UnionFind pego no site https://www.geeksforgeeks.org/dsa/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/
 
 class UnionFind {
     std::vector<int> parent;
@@ -95,6 +95,12 @@ int vizinho_acima(const std::vector<std::vector<int>>& matriz, int posicao_x_pix
 
     int pixel_acima = matriz[posicao_x_pixel-1][posicao_y_pixel];
     return pixel_acima;
+}
+
+int vizinho_diagona_esquerda(const std::vector<std::vector<int>>& matriz, int posicao_x_pixel, int posicao_y_pixel){
+
+    int pixel_diagonal_esquerda = matriz[posicao_x_pixel-1][posicao_y_pixel-1];
+    return pixel_diagonal_esquerda;
 }
 
 // Criar função que descobre se o pixel é vizinho 8
@@ -200,10 +206,11 @@ int main () {
             // Aqui o pixel está no meio da imagem. Sem nenhum implicação
             int posicao_pixel_acima = (coluna*(i-1)) + j;
             int posicao_pixel_lado = (coluna*i)+ (j-1);
-            int pos_diag = (coluna * (i - 1)) + (j - 1);
+            int posicao_diagonal_esquerda = (coluna * (i - 1)) + (j - 1);
 
             int pixel_acima = vizinho_acima(imagem, i, j);
             int pixel_lado = vizinho_esquerda(imagem, i, j);
+            int pixel_diagonal_esquerda = vizinho_diagona_esquerda(imagem,i,j);
 
             if(pixel == pixel_acima){
                     unionFind.unite(posicao_pixel_acima, posicao_pixel_atual);
@@ -213,8 +220,8 @@ int main () {
                     unionFind.unite(posicao_pixel_lado, posicao_pixel_atual);
                 }
 
-            if (pixel == imagem[i - 1][j - 1]) {
-                    unionFind.unite(posicao_pixel_atual, pos_diag);
+            if (pixel == pixel_diagonal_esquerda) {
+                    unionFind.unite(posicao_pixel_atual, posicao_diagonal_esquerda);
                 }
         }
     }
@@ -235,7 +242,6 @@ int main () {
 
             if(imagem_array[i] == 1){
                 grupos_pixels_1++;
-
             }
 
         }
