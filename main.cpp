@@ -85,18 +85,21 @@ int vizinhos_quatro_eh_1(const std::vector<std::vector<int>>& matriz, int posica
     
 }
 
+// Função que dada uma matriz e a posição do pixel, descobre o valor do pixel do lado esquerdo
 int vizinho_esquerda(const std::vector<std::vector<int>>& matriz, int posicao_x_pixel, int posicao_y_pixel){
 
     int pixel_lado_esquerdo = matriz[posicao_x_pixel][posicao_y_pixel - 1];
     return pixel_lado_esquerdo;
 }
 
+// Função que dada uma matriz e a posição do pixel, descobre o valor do pixel de cima
 int vizinho_acima(const std::vector<std::vector<int>>& matriz, int posicao_x_pixel, int posicao_y_pixel){
 
     int pixel_acima = matriz[posicao_x_pixel-1][posicao_y_pixel];
     return pixel_acima;
 }
 
+// Função que dada uma matriz e a posição do pixel, descobre o valor do pixel da diagonal superior esquerdo
 int vizinho_diagona_esquerda(const std::vector<std::vector<int>>& matriz, int posicao_x_pixel, int posicao_y_pixel){
 
     int pixel_diagonal_esquerda = matriz[posicao_x_pixel-1][posicao_y_pixel-1];
@@ -145,7 +148,7 @@ int main () {
 
 
     // Função que passa por todos os pixeis e coloca em uma matriz
-    // Como usaremos union find precisa usar array
+    // Como usaremos union find precisa usar array onde cada posição diz qual o pai daquele pixel
     for(int i = 0; i < linha; i ++){
         for(int j = 0; j < coluna; j++){
 
@@ -166,40 +169,40 @@ int main () {
     for(int i = 0; i < linha; i ++){
         for(int j = 0; j < coluna; j++){
 
-
             int pixel = imagem_array[(coluna * i) + j];
 
             int posicao_pixel_atual = (coluna*i) + j;
 
 
-            // Se o pixel estiver na ponta, não faz nada
+            // Se o pixel estiver na ponta superior a esquerda da imagem, não faz nada
             if (i == 0 && j == 0){
                 continue;
             }
 
-            // Se estiver na extremidade de Y, pega só o pixel do lado
+            // Se estiver na extremidade de cima da imagem, pega só o pixel do lado
             if (i == 0){
 
                 int posicao_pixel_lado = (coluna*i)+ (j-1);
                 int pixel_lado = vizinho_esquerda(imagem, i, j);
 
                 if(pixel == pixel_lado){
-                    unionFind.unite(posicao_pixel_lado, posicao_pixel_atual);
+                    unionFind.unite(posicao_pixel_atual, posicao_pixel_lado);
                 }
 
                 continue;
 
             }
 
-            // Se tiver no topo da matriz, pega só o vizinho de cima
+            // Se o pixel estiver na extremidade esquerda da matriz, pega só o vizinho de cima
             if(j == 0){
                 int posicao_pixel_acima = (coluna*(i-1)) + j;
 
                 int pixel_acima = vizinho_acima(imagem, i, j);
 
                 if(pixel == pixel_acima){
-                    unionFind.unite(posicao_pixel_acima, posicao_pixel_atual);
+                    unionFind.unite(posicao_pixel_atual, posicao_pixel_acima);
                 }
+
                 continue;
             }
 
@@ -213,11 +216,11 @@ int main () {
             int pixel_diagonal_esquerda = vizinho_diagona_esquerda(imagem,i,j);
 
             if(pixel == pixel_acima){
-                    unionFind.unite(posicao_pixel_acima, posicao_pixel_atual);
+                    unionFind.unite(posicao_pixel_atual, posicao_pixel_acima);
                 }
 
             if(pixel == pixel_lado){
-                    unionFind.unite(posicao_pixel_lado, posicao_pixel_atual);
+                    unionFind.unite(posicao_pixel_atual, posicao_pixel_lado);
                 }
 
             if (pixel == pixel_diagonal_esquerda) {
@@ -226,6 +229,7 @@ int main () {
         }
     }
 
+    // Pega os valores do UnionFind
     std::vector<int> parentes = unionFind.get();
 
     int grupos_pixels_0 = 0;
