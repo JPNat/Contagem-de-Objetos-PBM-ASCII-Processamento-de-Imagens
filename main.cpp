@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <set>
+#include <string.h>
 
-
+using namespace std;
 // Qual a ideia principal do algoritmo?
 
 // Usar UnionFind para separar os pixels em pontos "pais"
@@ -10,54 +12,44 @@
 // Com isso, é fácil identificar agrupamentos de pixels 1 e de pixel 0
 
 
-// Código da classe UnionFind pego no site https://www.geeksforgeeks.org/dsa/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/
+// Código da classe UnionFind inspirado no código https://www.geeksforgeeks.org/dsa/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/
 
 class UnionFind {
-    std::vector<int> parent;
+    std::vector<int> pais;
 public:
+
     UnionFind(int size) {
-      
-        parent.resize(size);
-      
-        // Initialize the parent array with each 
-        // element as its own representative
+
+        pais.resize(size);
+
         for (int i = 0; i < size; i++) {
-            parent[i] = i;
+            pais[i] = i;
         }
     }
 
+    // Função criada para pegar o vetor "pais"
     std::vector<int> get(){
 
-        return parent;
+        return pais;
     }
 
-    // Find the representative (root) of the
-    // set that includes element i
     int find(int i) {
       
-        // If i itself is root or representative
-        if (parent[i] == i) {
+        if (pais[i] == i) {
             return i;
         }
-      
-        // Else recursively find the representative 
-        // of the parent
-        return find(parent[i]);
+        
+        // Função recursiva para achar o pai do outro nó até achar o verdadeiro pai
+        return find(pais[i]);
     }
 
-    // Unite (merge) the set that includes element 
-    // i and the set that includes element j
+
     void unite(int i, int j) {
       
-        // Representative of set containing i
-        int irep = find(i);
-      
-        // Representative of set containing j
-        int jrep = find(j);
-       
-        // Make the representative of i's set
-        // be the representative of j's set
-        parent[irep] = jrep;
+        int i_pai = find(i);
+        int j_pai = find(j);
+
+        pais[i_pai] = j_pai;
     }
 };
 
@@ -114,8 +106,9 @@ int main () {
 
     char endereco[1000];
 
-    printf("Digite o endereço da imagems: ");
-    scanf(" %[^\n]", endereco);
+    printf("Digite o endereco da imagems: ");
+    cin >> endereco;
+    //scanf(" %[^\n]", endereco);
 
     // Abre a imagem
     in = fopen(endereco, "rt");
@@ -129,14 +122,14 @@ int main () {
     char line[1024];
     char tipo[3];
 
-    // Lê o header (P2)
+    // Lê o header (P1)
     fscanf(in, "%s", tipo);
-    printf("Tipo: %s\n", tipo);
 
     // Lê a largura e altura
     int coluna, linha;
     fscanf(in, "%d %d", &coluna, &linha);
-    printf("%d %d \n", coluna, linha);
+    //cout << coluna << " x " << coluna << endl;
+    //printf("%d %d \n", coluna, linha);
 
 
     // Matriz da imagem como um vetor de vetores
@@ -226,8 +219,70 @@ int main () {
             if (pixel == pixel_diagonal_esquerda) {
                     unionFind.unite(posicao_pixel_atual, posicao_diagonal_esquerda);
                 }
+
+            // Caso dê algum problema, pode ser por causa da verificação da diagonal, em algum momento o valor de 2 diagonais podem se sobrepor e acabar interferindo no cálculo da raiz do fundo
         }
     }
+
+    set<int> ids_fundo_externo;
+
+    // Esse primeiro for aninhado serve basicamente para identificar o fundo (os zeros que circulam os objetos)
+    // Verifica as bordas da matriz e busca o pai do 0 atual, caso seja o mesmo que o anterior, esse zero pertence ao fundo
+    // Caso o 0 não tenha o mesmo pai em comum com os demais, ele não pertence ao fundo, portanto é um buraco
+    // O Union Find que é o responsável por fazer essa separação dos pais
+    for(int i = 0; i < linha; i++){
+        for(int j = 0; j < coluna; j++){
+            if(i == 0 || i == linha-1 || j == 0 || j == coluna-1){ // Borda
+                if(imagem[i][j] == 0){
+                    int raiz = unionFind.find((coluna * i) + j);
+                    ids_fundo_externo.insert(raiz);
+                }
+            }
+        }
+    }
+
+    set<int> objetos_com_buraco;
+    set<int> todos_objetos;
+
+    // Esse outro for aninhado verifica as vizinhanças entre 1 e 0 internos
+    // Basicamente ele faz a checagem assim: 
+    // Estou em um objeto (pixel = 1). Ao lado tem um pixel 0. Esse zero é filho do pai do fundo?
+    // Caso não, então é um buraco.
+    for(int i = 0; i < linha; i++){
+        for(int j = 0; j < coluna; j++){
+
+            if(imagem[i][j] == 1){ // Aqui é caso ache parte de um objeto
+                int idx_atual = (coluna * i) + j;
+                int raiz_objeto = unionFind.find(idx_atual);
+                todos_objetos.insert(raiz_objeto);
+
+                // Verifica os vizinhos em busca de zeros que não são fundo
+                int vizinhos_x[] = {i-1, i+1, i, i};
+                int vizinhos_y[] = {j, j, j-1, j+1};
+
+                for(int k = 0; k < 4; k++){
+                    int ni = vizinhos_x[k];
+                    int nj = vizinhos_y[k];
+
+                    // se for válido 
+                    if(ni >= 0 && ni < linha && nj >= 0 && nj < coluna){
+                        if(imagem[ni][nj] == 0){ // e zero
+                            int raiz_zero = unionFind.find((coluna * ni) + nj);
+
+                            // e não for um fundo exerto, então é um buraco 
+                            if(ids_fundo_externo.find(raiz_zero) == ids_fundo_externo.end()){
+                                objetos_com_buraco.insert(raiz_objeto);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    int total_objetos = todos_objetos.size();
+    int qtd_com_buraco = objetos_com_buraco.size();
+    int qtd_sem_buraco = total_objetos - qtd_com_buraco;
 
     // Pega os valores do UnionFind
     std::vector<int> parentes = unionFind.get();
@@ -235,22 +290,26 @@ int main () {
     int grupos_pixels_0 = 0;
     int grupos_pixels_1 = 0;
 
-    // Conta os parentes
-    for(int i = 0; i < coluna*linha; i++){
+    // // Conta os parentes
+    // for(int i = 0; i < coluna*linha; i++){
 
-        if(unionFind.find(i) == i){
+    //     if(unionFind.find(i) == i){
 
-            if(imagem_array[i] == 0){
-                grupos_pixels_0++;
-            }
+    //         if(imagem_array[i] == 0){
+    //             grupos_pixels_0++;
+    //         }
 
-            if(imagem_array[i] == 1){
-                grupos_pixels_1++;
-            }
+    //         if(imagem_array[i] == 1){
+    //             grupos_pixels_1++;
+    //         }
 
-        }
-    }
+    //     }
+    // }
 
-    printf("Numero de objetos: %d \n", grupos_pixels_1);
-    printf("Numero de buracos: %d", grupos_pixels_0 - 1);
+    cout << "Numero de objetos: " << total_objetos << endl;
+    cout << "Objetos com buracos: " << qtd_com_buraco << endl;
+    cout << "Objetos sem buracos: " << qtd_sem_buraco << endl;
+
+    // printf("Numero de objetos: %d \n", grupos_pixels_1);
+    // printf("Numero de buracos: %d", grupos_pixels_0 - 1);
 };
